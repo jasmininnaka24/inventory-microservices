@@ -13,19 +13,29 @@ public class InventoryProduct {
     private String productName;
     private String description;
     private double originalPrice;
+    private double averageProductReviewRating;
 
     public InventoryProduct(){
 
     }
 
-    public InventoryProduct(Long id, String productName, String description, double originalPrice){
+    public InventoryProduct(Long id, String productName, String description, double originalPrice, double averageProductReviewRating){
         this.id = id;
         this.productName = productName;
         this.description = description;
         this.originalPrice = originalPrice;
+        this.averageProductReviewRating = averageProductReviewRating;
     }
 
     // getters and setters
+
+    public double getAverageProductReviewRating() {
+        return averageProductReviewRating;
+    }
+
+    public void setAverageProductReviewRating(double averageProductReviewRating) {
+        this.averageProductReviewRating = averageProductReviewRating;
+    }
 
     public Long getId() {
         return id;

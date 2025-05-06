@@ -13,14 +13,16 @@ public class InventoryReview {
     private String title;
     private String description;
     private double rating;
+    private Long productId;
 
     public InventoryReview(){}
 
-    public InventoryReview(Long id, String title, String description, double rating){
+    public InventoryReview(Long id, String title, String description, double rating, Long productId){
         this.id = id;
         this.title = title;
         this.description = description;
         this.rating = rating;
+        this.productId = productId;
     }
 
     // getters and setters
@@ -55,5 +57,13 @@ public class InventoryReview {
 
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Long getProductId() {
+        return productId;
     }
 }

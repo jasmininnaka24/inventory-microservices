@@ -3,6 +3,8 @@ package com.inventory.inventory_review.inventory_review.impl;
 import com.inventory.inventory_review.inventory_review.InventoryReview;
 import com.inventory.inventory_review.inventory_review.InventoryReviewRepository;
 import com.inventory.inventory_review.inventory_review.InventoryReviewService;
+import com.inventory.inventory_review.inventory_review.messaging.dto.ReviewMessage;
+import com.inventory.inventory_review.inventory_review.messaging.producer.ReviewMessageProducer;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +12,11 @@ import java.util.List;
 @Service
 public class InventoryReviewServiceImplementation implements InventoryReviewService {
     private final InventoryReviewRepository inventoryReviewRepository;
+    private final ReviewMessageProducer reviewMessageProducer;
 
-    public InventoryReviewServiceImplementation(InventoryReviewRepository inventoryReviewRepository) {
+    public InventoryReviewServiceImplementation(InventoryReviewRepository inventoryReviewRepository, ReviewMessageProducer reviewMessageProducer) {
         this.inventoryReviewRepository = inventoryReviewRepository;
+        this.reviewMessageProducer = reviewMessageProducer;
     }
 
     @Override
@@ -20,9 +24,19 @@ public class InventoryReviewServiceImplementation implements InventoryReviewServ
         return inventoryReviewRepository.findAll();
     }
 
+    public double calculateAverageRating(Long productId) {
+        List<InventoryReview> reviews = inventoryReviewRepository.findByProductId(productId);
+        return reviews.stream().mapToDouble(InventoryReview::getRating).average().orElse(0.0);
+    }
+
     @Override
     public InventoryReview addInventoryReview(InventoryReview inventoryReview) {
-        return inventoryReviewRepository.save(inventoryReview);
+        InventoryReview saved = inventoryReviewRepository.save(inventoryReview);
+        double averageProductReviewRating = calculateAverageRating(saved.getProductId());
+
+        // Send message to RabbitMQ after saving
+        reviewMessageProducer.sendReviewMessage(saved, averageProductReviewRating);
+        return saved;
     }
 
     @Override

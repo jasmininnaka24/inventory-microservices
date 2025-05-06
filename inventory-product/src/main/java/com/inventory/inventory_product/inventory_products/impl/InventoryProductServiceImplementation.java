@@ -3,6 +3,9 @@ package com.inventory.inventory_product.inventory_products.impl;
 import com.inventory.inventory_product.inventory_products.InventoryProduct;
 import com.inventory.inventory_product.inventory_products.InventoryProductRepository;
 import com.inventory.inventory_product.inventory_products.InventoryProductService;
+import com.inventory.inventory_product.inventory_products.messaging.dto.ReviewMessage;
+import org.hibernate.annotations.NotFound;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +26,14 @@ public class InventoryProductServiceImplementation implements InventoryProductSe
     @Override
     public InventoryProduct getInventoryProduct(Long id){
         return inventoryProductRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void updateAverageRating(ReviewMessage reviewMessage) {
+            InventoryProduct inventoryProduct = inventoryProductRepository.findById((reviewMessage.getProductId())).orElseThrow(() -> new RuntimeException("Company not found " + reviewMessage.getProductId()));
+
+            inventoryProduct.setAverageProductReviewRating(reviewMessage.getAverageProductReviewRating());
+            inventoryProductRepository.save(inventoryProduct);
     }
 
     @Override
@@ -50,4 +61,6 @@ public class InventoryProductServiceImplementation implements InventoryProductSe
             return false;
         }
     }
+
+
 }
